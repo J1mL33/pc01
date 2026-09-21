@@ -463,7 +463,7 @@
                     { name: "CHACON HENDER ARISTOBULO", role: "LIDER TECNICO", mission: "Escribe aquí tu misión...", video: "#", img: "./media/hender.jpg" },
                     { name: "JUNCA GONZALEZ STELLA", role: "INGENIERO DE PROYECTOS", mission: "Escribe aquí tu misión...", video: "#", img: "./media/stella.jpg" },
                     { name: "LEAL RIVERA ANDREA CAMILA", role: "ANALISTA DE CERTIFICACION", mission: "Escribe aquí tu misión...", video: "#", img: "./media/andrea.jpg" },
-                    { name: "LESMES SALAMANCA JIM ESBER", role: "INGENIERO DE PROYECTOS", mission: "Escribe aquí tu misión...", video: "#", img: "./media/jim.jpg" },
+                    { name: "LESMES SALAMANCA JIM ESBER", role: "INGENIERO DE PROYECTOS", mission: "Hola, soy Jim. Hago parte del equipo de Compensación desde marzo de 2023. Como Ingeniero de Proyectos, me encargo del análisis, diseño y desarrollo de las soluciones de software. Mi aporte principal al grupo es hacer realidad esos requerimientos a través del código y garantizar la calidad técnica de cada entrega, asegurando que nuestras aplicaciones funcionen sin problemas.", video: "https://asnetl-my.sharepoint.com/personal/jim_lesmes_asnetla_com/_layouts/15/embed.aspx?UniqueId=e454d114-642f-46b0-874d-b1dc89dff1d9", img: "./media/jim.jpg" },
                     { name: "LLANOS GOMEZ JENIFFER", role: "ANALISTA DE CERTIFICACION", mission: "Escribe aquí tu misión...", video: "#", img: "./media/jeniffer.jpg" },
                     { name: "LOPEZ ROJAS JESSICA PAOLA", role: "INGENIERO DE PROYECTOS", mission: "Escribe aquí tu misión...", video: "#", img: "./media/jessica.jpg" },
                     { name: "MEJIA GARZON MARTHA LILIANA", role: "COORDINADOR DE CERTIFICACION", mission: "Escribe aquí tu misión...", video: "#", img: "./media/martha.jpg" },
@@ -474,8 +474,12 @@
                     { name: "PARDO BARBOSA NATALY", role: "ANALISTA DE CERTIFICACION", mission: "Escribe aquí tu misión...", video: "#", img: "./media/nataly.jpg" }
                 ],
 				"Crédito": null,
-                "Soporte a producción": null,
-                "Equipo JAVA": null
+              "Soporte a producción": null,
+                "Equipo JAVA": [
+                    { name: "OSORIO CASTRO SEBASTIAN", role: "LIDER TECNICO", mission: "Escribe aquí tu misión...", video: "#", img: "https://ui-avatars.com/api/?name=SO&background=0D8ABC&color=fff&size=200" },
+                    { name: "SANCHEZ BERRIO MARIA PAULA", role: "LIDER TECNICO", mission: "Escribe aquí tu misión...", video: "#", img: "https://ui-avatars.com/api/?name=MS&background=0D8ABC&color=fff&size=200" },
+                    { name: "SIERRA BAEZ CAROL JULIETH", role: "INGENIERO DE PROYECTOS JUNIOR", mission: "Escribe aquí tu misión...", video: "#", img: "https://ui-avatars.com/api/?name=CS&background=0D8ABC&color=fff&size=200" }
+                ]
             },
             "Gerencia de Gobernanza de Proyectos": null,
 			"Gerencia de Infraesructura Tecnológica": null,
@@ -815,44 +819,38 @@
         $("modal-restricted").classList.add("hidden");
       }
 
-      // --- LÓGICA DE REPRODUCTOR DE VIDEO ---
-      function extractYouTubeID(url) {
-        if (!url) return null;
-        // Regex inteligente para atrapar IDs de YouTube sin importar cómo lo peguen
-        const regExp =
-          /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(regExp);
-        return match && match[2].length === 11 ? match[2] : null;
-      }
-
-      function openVideoModal(videoUrl) {
-        // Si el usuario no tiene video, mostramos la pantalla de "Restringido"
-        if (!videoUrl || videoUrl === "#" || videoUrl.trim() === "") {
-          showRestricted();
-          return;
+      // --- LÓGICA DE REPRODUCTOR DE VIDEO (MICROSOFT STREAM) ---
+        function openVideoModal(videoUrl) {
+            // Si el usuario no tiene video, mostramos la pantalla de "Restringido"
+            if (!videoUrl || videoUrl === "#" || videoUrl.trim() === "") {
+                showRestricted();
+                return;
+            }
+            
+            playSound('enter');
+            const iframe = $('video-frame');
+            
+            // Procesamiento de URL para Microsoft Stream / SharePoint
+            let finalUrl = videoUrl;
+            
+            // Truco Cyberpunk: Si es un link de Stream, intentamos forzar el Autoplay
+            if (finalUrl.includes('sharepoint.com') || finalUrl.includes('microsoftstream.com')) {
+                if (!finalUrl.includes('autoplay=')) {
+                    finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'autoplay=true';
+                }
+            }
+            
+            // Inyectamos el video en el reproductor retro
+            iframe.src = finalUrl;
+            $('modal-video').classList.remove('hidden');
         }
 
-        playSound("enter");
-        const videoId = extractYouTubeID(videoUrl);
-        const iframe = $("video-frame");
-
-        if (videoId) {
-          // Generar link embebido de YouTube (Autoplay, sin controles sucios)
-          iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&color=white`;
-        } else {
-          // Si es un video de Vimeo, Drive, etc., intentamos cargarlo directo
-          iframe.src = videoUrl;
+        function closeVideoModal() {
+            playSound('blip');
+            $('modal-video').classList.add('hidden');
+            // IMPORTANTE: Vaciar el src detiene el video para que no siga sonando de fondo
+            $('video-frame').src = ""; 
         }
-
-        $("modal-video").classList.remove("hidden");
-      }
-
-      function closeVideoModal() {
-        playSound("blip");
-        $("modal-video").classList.add("hidden");
-        // IMPORTANTE: Vaciar el src detiene el video para que no siga sonando de fondo
-        $("video-frame").src = "";
-      }
     </script>
   </body>
 </html>
